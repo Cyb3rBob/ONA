@@ -1,3 +1,8 @@
+# Makes a duplicate of a UDP packet that can be sent to two different destinations
+# The origional intent is to allow multiple NetFlow flow-flow collectors to receive packets 
+# from a single exporter
+
+
 from scapy.all import *
 
 def forward_packet(packet, dest1, dest2):
@@ -7,8 +12,8 @@ def forward_packet(packet, dest1, dest2):
     sendp(packet2, iface="eth0", dst=dest2)
 
 def process_packet(packet):
-    if packet.haslayer(IP) and packet.haslayer(UDP) and packet[UDP].dport == 80:  # Change 80 to your desired UDP port
-        forward_packet(packet, "192.168.1.10", "192.168.1.20")
+    if packet.haslayer(IP) and packet.haslayer(UDP) and packet[UDP].dport == 2055:  # Change 2055 to your desired UDP port
+        forward_packet(packet, "192.168.1.10", "192.168.1.20") # Change to ip address of UDP Receivers
 
 def sniff_packets(interface):
     sniff(filter="ip", prn=process_packet, iface=interface)
@@ -16,3 +21,4 @@ def sniff_packets(interface):
 # Specify the interface
 input_interface = "eth1"  # Change this to the desired interface
 sniff_packets(input_interface)
+
