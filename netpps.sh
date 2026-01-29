@@ -13,7 +13,7 @@
 # --- HOW TO RUN: ---
 # 1. Find your interface name by running the command:  ip link
 #    If you have more then one interface, make sure you pick the one with the correct IP Address.
-#    Run this script xample: ./netpps.sh <interface_name>  (e.g., ./netpps.sh eth0)
+#    Run this script xample: netpps.sh <interface_name>  (e.g., netpps.sh eth0)
 # 2. To stop Press: CTRL + C
 
 # Configuration
