@@ -7,3 +7,7 @@ The script doesn't record data long term, or compare it to any standard values. 
 netspeed.sh = script to see how much traffic is being sent to an interface, expressed in kB/s.  (KiloBytes per second).  Remember a byte is made up of 8bits, so 100,000 Kilobytes would be 800 mb/s. (megabits per second)
 Most interfaces are 1 Gig these days or better.  So you can get a basic understanding of how much traffic is coming into and out of an interface using this script. 
 
+devices.sh = script to see exporters (routers/switches/firewalls) that are sending telemetry (NetFlow) to your PNM/ONA Sensor.  You can change the ports
+identified as receiving ports to the correct ones for your network. The CAPTURE_COUNT variable shows how many packets are captured to create the list.
+I've used 10,000 as the default. But, in larger networks this may need to be increased to ensure all exporters are identified.  In smaller networks
+you may want to reduce this number.  The script will run until the count designated is reached. 
