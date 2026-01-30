@@ -5,13 +5,15 @@
 # and leaving your PNM/ONA sensor every second.
 #
 # --- QUICK SETUP ---
-# 1. Use WinSCP or some similar tool to copy the file to: /usr/local/bin on your PNM/ONA Sensor. 
+# 1. Login to your PNM/ONA sensor.  Change Directory to /usr/local/bin directory. (e.g., cd /usr/local/bin)
 #    This location is commonly used for custom scripts that should be
 #    available to all users on the system.
+# 2. Type: sudo wget https://raw.githubusercontent.com/Cyb3rBob/ONA/refs/heads/master/netspeed.sh
+#    This will automatically download the file to your system.
 # 2. Give permission so anyone can run it:  sudo chmod +x /usr/local/bin/netspeed.sh
 # 
 # --- HOW TO RUN: ---
-# 1. Find your interface name by running the command:  ip link
+# 1. Find your interface name by running the command:  ip addr
 #    If you have more then one interface, make sure you pick the one with the correct IP Address.
 #    Run this script xample: netspeed.sh <interface_name>  (e.g., netspeed.sh eth0)
 # 2. To stop Press: CTRL + C
