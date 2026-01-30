@@ -24,6 +24,7 @@
 OUTPUT_FILE="exporters.txt"
 INTERFACE="any"
 PORTS="9995 or 9997"  # change port numbers to ports used on your sensor.  (e.g., 2055, 9996 etc..)
+#                       You can add several, for instance (e.g., 2055 or 9995 or 9996 or 9999)
 CAPTURE_COUNT=10000   # Increase or decrease capture count as needed based on how much traffic is 
 #                       being sent to your sensor.  (Higher = longer capture period)
 
