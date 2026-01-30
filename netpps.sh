@@ -5,9 +5,11 @@
 # and leaving (TX) your computer every second.
 #
 # --- QUICK SETUP ---
-# 1. Use WinSCP or some similar tool to copy the file to: /usr/local/bin on your PNM/ONA Sensor. 
+# 1. Login to your PNM/ONA sensor.  Change Directory to /usr/local/bin directory. (e.g., cd /usr/local/bin)
 #    This location is commonly used for custom scripts that should be
 #    available to all users on the system.
+# 2. Type: sudo wget https://raw.githubusercontent.com/Cyb3rBob/ONA/refs/heads/master/netpps.sh
+#    This will automatically download the file to your system.
 # 2. Give permission so anyone can run it:  sudo chmod +x /usr/local/bin/netpps.sh
 # 
 # --- HOW TO RUN: ---
