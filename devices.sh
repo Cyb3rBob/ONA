@@ -1,23 +1,50 @@
 #!/bin/bash
 
-# file to save captured exporter ip addresses
-# copy file to /usr/local/bin.  This is the best place so they are available to everyone who logs in.
-# set script rights so anyone can run it:  sudo chmod 755 devices.sh
-# Make the script executable:  sudo chmod +x devices.sh
-# Change the port numbers as needed and the count as well.  Higher count is better for a large environment
-# with lots of traffic.  (ex: -c 5000) or even more in high traffic environments.
-# run script:   ./devices.sh
-OUTPUT_FILE='exporters.txt'
+# --- PURPOSE --- 
+# This script identifies all of the NetFlow Exporters (Routers/switches/firewalls)
+# that are sending telemetry (NetFlow) to your PNM/ONA Sensor.
+#
+# --- QUICK SETUP ---
+# 1. Login to your PNM/ONA sensor.  Change Directory to /usr/local/bin directory. (e.g., cd /usr/local/bin)
+#    This location is commonly used for custom scripts that should be
+#    available to all users on the system.
+# 2. Type: sudo wget https://raw.githubusercontent.com/Cyb3rBob/ONA/refs/heads/master/devices.sh
+#    This will automatically download the file to your system.
+# 2. Give permission so anyone can run it:  sudo chmod +x /usr/local/bin/devices.sh
+# 
+# --- HOW TO RUN: ---
+# 1. Type:  devices.sh
+# 2. Script will automatically stop after the set number of packets is received.  By default this is 
+#    10,000 packets.  This may need to be increased or decreased depending on how much telemetry
+#    is being sent to your sensor.
 
-# tcpdump command
-tcpdump -nn -l udp port 9997 or udp port 9995 -c 100  2>/dev/null | \
-awk '{print $3}' | cut -d. -f1-4 | sort | uniq > "$OUTPUT_FILE"
+# Configuration
+OUTPUT_FILE="exporters.txt"
+INTERFACE="any"       
+PORTS="9995 or 9997"  # change port numbers to ports used on your sensor.  (e.g., 2055, 9996 etc..)
+CAPTURE_COUNT=10000   # Increase or decrease capture count as needed based on how much traffic is 
+#                       being sent to your sensor.  (Higher = longer capture period)
 
-# count number of devices using word count
-echo "Total IPs: $(wc -l < "$OUTPUT_FILE")" >> $OUTPUT_FILE
-echo ""
-cat $OUTPUT_FILE
-echo ""
-echo "Source IP addresses sending Netflow are saved in $OUTPUT_FILE"
-echo ""
+# temporary file to prevent accidental overwrites if the script fails
+TMP_FILE=$(mktemp)
+
+echo "Capturing $CAPTURE_COUNT packets on ports: $PORTS..."
+
+tcpdump -i "$INTERFACE" -nn -q -c "$CAPTURE_COUNT" "udp port $PORTS" 2>/dev/null | \
+    grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" | \
+    sort -u > "$TMP_FILE"
+
+IP_COUNT=$(wc -l < "$TMP_FILE")
+
+{
+    cat "$TMP_FILE"
+    echo "---"
+    echo "Total IPs: $IP_COUNT"
+    echo "Timestamp: $(date)"
+} > "$OUTPUT_FILE"
+
+cat "$OUTPUT_FILE"
+rm "$TMP_FILE"
+
+echo -e "\nSource IP addresses saved to $OUTPUT_FILE"
 
