@@ -33,11 +33,7 @@ if [[ $EUID -ne 0 ]]; then
    echo "Error: This script must be run as root."
    exit 1
 fi
-<<<<<<< HEAD
-
-=======
 #
->>>>>>> 4af6e7dcbe4ccc4befa4f38d1f8d9543ea9cabef
 # Security: Prevent symlink attacks on the output file
 if [[ -L "$OUTPUT_FILE" ]]; then
     echo "Error: $OUTPUT_FILE is a symbolic link. Aborting to prevent overwrite."
