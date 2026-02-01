@@ -27,7 +27,19 @@ PORTS="9995 or 9997"  # change port numbers to ports used on your sensor.  (e.g.
 #                       You can add several, for instance (e.g., 2055 or 9995 or 9996 or 9999)
 CAPTURE_COUNT=10000   # Increase or decrease capture count as needed based on how much traffic is 
 #                       being sent to your sensor.  (Higher = longer capture period)
+#
+# Ensure script is run as root
+if [[ $EUID -ne 0 ]]; then
+   echo "Error: This script must be run as root."
+   exit 1
+fi
 
+# Security: Prevent symlink attacks on the output file
+if [[ -L "$OUTPUT_FILE" ]]; then
+    echo "Error: $OUTPUT_FILE is a symbolic link. Aborting to prevent overwrite."
+    exit 1
+fi
+#
 # temporary file to prevent accidental overwrites if the script fails
 TMP_FILE=$(mktemp)
 
