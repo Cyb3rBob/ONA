@@ -17,7 +17,7 @@
 #    If you have more then one interface, make sure you pick the one with the correct IP Address.
 #    Run this script xample: netpps.sh <interface_name>  (e.g., netpps.sh eth0)
 # 2. To stop Press: CTRL + C
-
+#
 # Configuration
 INTERVAL=${2:-1} # Defaults to 1s if second argument is missing
 IF=$1
@@ -27,17 +27,17 @@ if [ -z "$IF" ]; then
     echo "Usage: $0 [interface] [interval_seconds]"
     exit 1
 fi
-
+#
 # Validation: Check if interface exists
 if [ ! -d "/sys/class/net/$IF" ]; then
     echo "Error: Interface '$IF' not found."
     exit 1
 fi
-
+#
 echo
 echo "Monitoring $IF (Press CTRL+C to stop)..."
 echo
-
+#
 while true
 do
     R1=$(cat /sys/class/net/"$IF"/statistics/rx_packets)
