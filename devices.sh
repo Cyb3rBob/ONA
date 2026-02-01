@@ -34,12 +34,6 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 #
-# Security: Prevent symlink attacks on the output file
-if [[ -L "$OUTPUT_FILE" ]]; then
-    echo "Error: $OUTPUT_FILE is a symbolic link. Aborting to prevent overwrite."
-    exit 1
-fi
-#
 # temporary file to prevent accidental overwrites if the script fails
 TMP_FILE=$(mktemp)
 
