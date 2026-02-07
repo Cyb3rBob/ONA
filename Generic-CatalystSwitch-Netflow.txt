@@ -1,0 +1,63 @@
+! Basic Template for NetFlow on a generic Catalyst switch
+! Update Interface Ranges to reflect the number of ports on your devices
+! Items in all CAPS can be renamed to whatever you want
+! Ensure IP Address and Port numbers are accurate for your ONA/PNM Sensor/Flow Collector
+! usually the ports for NetFlow are 9995 or 2055
+! Link to Video on how to use this template:  https://youtu.be/K1K9UGFmRbU
+	 
+!
+flow record XDR_FLOW_RECORD
+  description NetFlow record format to send to XDR
+  match ipv4 protocol
+  match ipv4 source address
+  match ipv4 destination address
+  match transport source-port
+  match transport destination-port
+  collect counter bytes long
+  collect counter packets long
+  collect timestamp absolute first
+  collect timestamp absolute last
+  collect transport tcp flags             ! OPTIONAL: Do not worry if command doesn't take on switch.
+!
+flow exporter NETFLOW_TO_XDR_FC
+  description Export NetFlow to XDR Flow Collector
+  destination <IP-ADDRESS>          			! Replace with the IP Address of your ONA/PNM Sensor/Flow Collector
+  ! source Loopback0                			! OPTIONAL: Source Interface for sending Flow Telemetry (e.g. Loopback0)
+  transport udp <PORT>							      ! Replace with the appropriate port configured on your ONA/PNM Sensor/Flow Collector
+  template data timeout 30
+!
+flow monitor XDR_FLOW_MONITOR
+  record XDR_FLOW_RECORD
+  exporter XDR_FLOW_EXPORTER
+  cache timeout active 60
+  cache timeout inactive 15
+! 
+  
+  
+
+!----------------------------------------------------------------------------------
+! Example interface commands below.  You must change these to your specific switch.  If you have 48 ports on a switch
+! change the range to -48.  The 'ip flow monitor' command can go on access ports and trunk ports but not port-channels.
+! The 'ip flow monitor' command can also go on VLAN interfaces.
+  
+! FLOW MONITOR ON PHYSICAL INTERFACES
+interface range gi1/0 - 24                                       
+  ip flow monitor XDR_FLOW_MONITOR input
+  ip flow monitor XDR_FLOW_MONITOR output    ! This command doesn't take on some older versions of code or smaller switches.
+  
+! TRUNK INTERFACES
+interface range gi1/25 - 26
+  ip flow monitor XDR_FLOW_MONITOR input
+  ip flow monitor XDR_FLOW_MONITOR output    ! This command doesn't take on some older versions of code or smaller switches.
+ 
+! FLOW MONITOR ON VLAN example. Note: you do not need to add this to layer-3 SVI's if you have the 'ip flow monitor' command
+! on every layer-2 interface.
+vlan configuration 5                             
+  ip flow monitor XDR_FLOW_MONITOR input
+  ip flow monitor XDR_FLOW_MONITOR output    ! This command doesn't take on some older versions of code or smaller switches.
+
+  
+! Validate Configuration
+show flow record XDR_FLOW_RECORD
+show flow monitor XDR_FLOW_MONITOR statistics    ! Best one for showing how much flow has been sent
+show flow monitor XDR_FLOW_MONITOR cache
