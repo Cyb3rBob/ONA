@@ -1,0 +1,85 @@
+! Basic Template for NetFlow and ETA
+! Update Interface Ranges to reflect the number of ports on your devices
+! Items in all CAPS can be renamed to whatever you want
+! Ensure IP Address and Port numbers are accurate for your ONA/PNM Sensor/Flow Collector
+! CVD - ETA deployment Guide - https://www.cisco.com/c/dam/en/us/td/docs/solutions/CVD/Campus/CVD-Encrypted-Traffic-Analytics-Deployment-Guide-2018AUG.pdf
+! https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9300/software/release/16-6/configuration_guide/nmgmt/b_166_nmgmt_9300_cg/b_166_nmgmt_9300_cg_chapter_0111.html
+! https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9300/software/release/16-6/configuration_guide/nmgmt/b_166_nmgmt_9300_cg/b_166_nmgmt_9300_cg_chapter_01000.html
+! Link to Video on how to use this template:  https://youtu.be/Mpo4VURatD4
+
+! Note: regular netflow and ETA can not be configured on the same layer-2 interface.  Recommend placing 'ip flow monitor' command
+! on the layer-2 interfaces to endpoints, and ET-Analytics on the trunk interfaces.  
+
+! Note: When configuring a Catalyst Switch for both traditional NetFlow and ET-Analytics you can only add the basic 9-Tuples
+! to the 'flow record' as is show in this template.
+
+!
+flow record XDR_FLOW_RECORD
+  description NetFlow record format to send to XDR
+  match ipv4 protocol
+  match ipv4 source address
+  match ipv4 destination address
+  match transport source-port
+  match transport destination-port
+  collect counter bytes long
+  collect counter packets long
+  collect timestamp absolute first
+  collect timestamp absolute last
+!
+flow exporter NETFLOW_TO_XDR_FC
+  description Export NetFlow to XDR Flow Collector
+  destination <IP-ADDRESS>          			! Replace with the IP Address of your ONA/PNM Sensor/Flow Collector
+  ! source Loopback0                			! OPTIONAL: Source Interface for sending Flow Telemetry (e.g. Loopback0)
+  transport udp <PORT>							      ! Replace with the appropriate port configured on your ONA/PNM Sensor/Flow Collector
+  template data timeout 30
+
+flow monitor XDR_FLOW_MONITOR
+  record XDR_FLOW_RECORD
+  exporter NETFLOW_TO_XDR_FC
+  cache timeout active 60
+  cache timeout inactive 15
+!
+
+!----------------------------------------------------------------------------------
+! Example interface commands below.  You must change these to your specific switch.  If you have 24 ports on a switch
+! change the range to -24.  
+! The 'ip flow monitor' command can also go on VLAN interfaces.  This is not necessary if it is placed on every layer-2 interface
+! that is connected to an endpoint. 
+
+interface range Gig1/0/1-48
+  ip flow monitor XDR_FLOW_MONITOR input
+  ip flow monitor XDR_FLOW_MONITOR output
+!
+interface range Gig1/1/1-4
+  ip flow monitor XDR_FLOW_MONITOR input
+  ip flow monitor XDR_FLOW_MONITOR output
+!
+interface range Te1/1/1-8
+  ip flow monitor XDR_FLOW_MONITOR input
+  ip flow monitor XDR_FLOW_MONITOR output
+!
+interface vlan100                     ! Example - Change this to your VLAN ID numbers
+  ip flow monitor IPv4_NETFLOW input
+  ip flow monitor IPv4_NETFLOW output
+
+_______________________________________________
+ET Analytics - add-on
+
+! et-analytics command is not supported on SVI interfaces!  Only Layer-2.  Recomend placing 'et-analytics enable' command on trunk interfaces.
+
+et-analytics
+  ip flow-export destination <flow_collector_ip_address> <flow_collector_port>     !Port 9999 Replace with the IP Address and Port of your ONA/PNM Sensor/Flow Collector
+  inactive-timeout 15
+  
+! Place 'et-analytics enable' command on Trunk Interfaces, remember et-analytics and 'ip flow monitor' commands can not be on same interface.
+! The command will take, but the NetFlow will not be sent to the XDR Flow Collector
+
+interface rangeinterface range Te1/1/1 - 8
+  et-analytics enable
+
+! VALIDATION COMMANDS
+!  show flow record XDR_FLOW_RECORD
+!  show flow monitor XDR_FLOW_MONITOR statistics    ! Best one for showing how much flow has been sent
+!  show flow monitor XDR_FLOW_MONITOR cache
+
+
