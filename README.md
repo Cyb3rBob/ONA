@@ -1,6 +1,10 @@
 All the scripts in this repository are available for use by anyone.  
 All the scripts in this repository are meant to address questions or capabilities inside of Cisco XDR Analytics's PNM/ONA Sensor, though they will likely work on any linux workstation or server.
 
+NetFlow templates are also included in this repository. 
+
+Video's on how to use these templates and Bash scripts can be found here:  https://www.youtube.com/@Cyb3r-Bob
+
 netpps.sh = script to see the number of packets per second an interface is sending or receiving.  The value gets updated every second.  It can be used to see how much traffic is being sent to an interface.
 The script doesn't record data long term, or compare it to any standard values.  Setup SNMP on your server if you need to see long term trends etc...
 
